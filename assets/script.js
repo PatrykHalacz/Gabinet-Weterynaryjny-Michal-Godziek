@@ -18,25 +18,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- AUTOMATYCZNY SLIDESHOW TŁA ---
-    const slides = document.querySelectorAll('.hero-slide');
     const slideIntervalTime = 5000; // Czas zmiany slajdu (5 sekund)
-    let currentSlideIndex = 0;
-
-    function nextSlide() {
-        if (slides.length > 0) {
-            // Zabierz klasę active z obecnego
-            slides[currentSlideIndex].classList.remove('active');
-            
-            // Oblicz następny indeks
-            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-            
-            // Dodaj klasę active do następnego
-            slides[currentSlideIndex].classList.add('active');
-        }
+    
+    // Funkcja do zwracania AKTYWNEGO zestawu slajdów (desktop lub mobile)
+    function getActiveSlideSet() {
+        // Sprawdź, czy pasuje media query dla urządzeń mobilnych (<= 768px)
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        
+        // Zwróć NodeList odpowiedniego zestawu slajdów
+        return isMobile 
+            ? document.querySelectorAll('.mobile-slide') 
+            : document.querySelectorAll('.desktop-slide');
     }
+    
+    // Główna funkcja przełączania slajdów
+    function nextSlide() {
+        const slides = getActiveSlideSet();
+        if (slides.length === 0) return;
+        let currentActiveSlide = document.querySelector('.hero-slide.active');
+        
+        let currentIndex = -1;
 
-    // Uruchom slideshow tylko jeśli są slajdy
-    if (slides.length > 0) {
+        for (let i = 0; i < slides.length; i++) {
+            if (slides[i] === currentActiveSlide) {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // 1. Jeśli żaden slajd z AKTYWNEGO zestawu nie jest aktywny
+        if (currentIndex === -1) {
+            document.querySelectorAll('.hero-slide.active').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            slides[0].classList.add('active');
+            return;
+        }
+
+        // 2. Kontynuuj normalne przełączanie
+        slides[currentIndex].classList.remove('active');
+        
+        // Oblicz następny indeks
+        let nextIndex = (currentIndex + 1) % slides.length;
+        
+        slides[nextIndex].classList.add('active');
+    }
+    
+    // Uruchom slideshow
+    const initialSlides = getActiveSlideSet();
+    if (initialSlides.length > 0) {
+        
+        if (!document.querySelector('.hero-slide.active')) {
+            initialSlides[0].classList.add('active');
+        } else {
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (isMobile && document.querySelector('.desktop-slide.active')) {
+                 nextSlide();
+            }
+        }
         setInterval(nextSlide, slideIntervalTime);
     }
+    
+    // Obsługa zmiany rozmiaru okna/orientacji
+    window.addEventListener('resize', nextSlide);
 });

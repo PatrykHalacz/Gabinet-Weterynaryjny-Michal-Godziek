@@ -172,9 +172,20 @@ header {
     background-position: center;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
+    display: none; /* Domyślnie ukrywamy, kontrolujemy to niżej */
 }
 
-.hero-slide.active {
+/* --- Domyślny widok: DESKTOP --- */
+.desktop-slide {
+    display: block; /* Pokaż desktopowe slajdy */
+}
+
+.mobile-slide {
+    display: none; /* Ukryj mobilne slajdy */
+}
+
+/* Domyślnie aktywny jest pierwszy slajd DESKTOPOWY */
+.desktop-slide.active {
     opacity: 1;
 }
 
@@ -416,5 +427,20 @@ footer {
         padding: 8px 15px;
         bottom: 20px;
         left: 10px;
+    }
+    
+    .desktop-slide {
+        display: none !important;
+        opacity: 0 !important;
+    }
+
+    .mobile-slide {
+        display: block !important;
+        background-position: top center;
+    }
+    
+    /* Mobilny slajd, który jest aktywny przez JS */
+    .mobile-slide.active {
+        opacity: 1 !important;
     }
 }
